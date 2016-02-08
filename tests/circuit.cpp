@@ -48,6 +48,7 @@ std::string getValue( const brion::NeuronMatrix& data, const size_t idx,
 
 BOOST_AUTO_TEST_CASE( test_invalid_open )
 {
+
     BOOST_CHECK_THROW( brion::Circuit( "/bla" ), std::runtime_error );
     BOOST_CHECK_THROW( brion::Circuit( "bla" ), std::runtime_error );
 
@@ -58,12 +59,22 @@ BOOST_AUTO_TEST_CASE( test_invalid_open )
     path = BBP_TESTDATA;
     path /= "local/simulations/may17_2011/Control/voltage.h5";
     BOOST_CHECK_THROW( brion::Circuit( path.string( )), std::runtime_error );
+
+    path = BBP_TESTDATA;
+    path /= "local/unexisting_circuit.mvd2";
+    BOOST_CHECK_THROW( brion::Circuit( path.string( )), std::runtime_error );
+
+    path = BBP_TESTDATA;
+    path /= "local/unexisting_circuit.mvd3";
+    BOOST_CHECK_THROW( brion::Circuit( path.string( )), std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE(test_all_attributes)
+BOOST_AUTO_TEST_CASE(test_all_attributes_mvd2)
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/circuits/circuit.mvd2";
+
+    std::cout << "BBP_TESTDATA circuit.mvd2: " << path.string() << std::endl;
 
     brion::Circuit circuit( path.string( ));
     BOOST_CHECK_EQUAL( circuit.getNumNeurons(), 10 );
@@ -81,6 +92,70 @@ BOOST_AUTO_TEST_CASE(test_all_attributes)
     BOOST_CHECK_EQUAL( getValue( data, 7, brion::NEURON_POSITION_Y ),
                        "399.305168" );
 }
+
+
+BOOST_AUTO_TEST_CASE(test_some_attributes_all_neurons_mvd3)
+{
+    boost::filesystem::path path( BBP_TESTDATA );
+    path /= "circuitBuilding_1000neurons/circuits/circuit_test.mvd3";
+
+    std::cout << "BBP_TESTDATA circuit.mvd3: " << path.string() << std::endl;
+
+    brion::Circuit circuit( path.string( ));
+    BOOST_CHECK_EQUAL( circuit.getNumNeurons(), 1000 );
+
+    const brion::NeuronMatrix& data = circuit.get( brion::GIDSet(),
+                                                 brion::NEURON_MORPHOLOGY_NAME | brion::NEURON_MTYPE | brion::NEURON_ETYPE
+                                                 );
+    std::cout << data << std::endl;
+
+    BOOST_CHECK_EQUAL( data.shape()[0], 1000 );   // 10 neurons
+    BOOST_CHECK_EQUAL( data.shape()[1],  3);
+    BOOST_CHECK_EQUAL( data[0][0],
+                       "sm090227a1-2_idC" );
+    BOOST_CHECK_EQUAL( data[999][0],
+                       "tkb060509a2_ch3_mc_n_el_100x_1" );
+    BOOST_CHECK_EQUAL( data[0][1], "0" );
+    BOOST_CHECK_EQUAL( data[999][1], "8" );
+    BOOST_CHECK_EQUAL( data[0][2], "0" );
+    BOOST_CHECK_EQUAL( data[25][2], "1" );
+
+}
+
+
+
+BOOST_AUTO_TEST_CASE(test_some_attributes_some_neurons_mvd3)
+{
+    boost::filesystem::path path( BBP_TESTDATA );
+    path /= "circuitBuilding_1000neurons/circuits/circuit_test.mvd3";
+
+    std::cout << "BBP_TESTDATA circuit.mvd3: " << path.string() << std::endl;
+
+    brion::Circuit circuit( path.string( ));
+    BOOST_CHECK_EQUAL( circuit.getNumNeurons(), 1000 );
+
+    brion::GIDSet gids;
+    gids.insert( 1 );
+    gids.insert( 25 );
+    const brion::NeuronMatrix& data = circuit.get( gids,
+                                                 brion::NEURON_MORPHOLOGY_NAME | brion::NEURON_MTYPE | brion::NEURON_ETYPE
+                                                 );
+    std::cout << data << std::endl;
+
+    BOOST_CHECK_EQUAL( data.shape()[0], 2 );   // 10 neurons
+    BOOST_CHECK_EQUAL( data.shape()[1],  3);
+    BOOST_CHECK_EQUAL( data[0][0],
+                       "sm090227a1-2_idC" );
+    BOOST_CHECK_EQUAL( data[1][0],
+                       "dend-rr110114C1_idA_axon-sm110131a1-3_INT_idA" );
+    BOOST_CHECK_EQUAL( data[0][1], "0" );
+    BOOST_CHECK_EQUAL( data[1][1], "1" );
+    BOOST_CHECK_EQUAL( data[0][2], "0" );
+    BOOST_CHECK_EQUAL( data[1][2], "1" );
+
+}
+
+
 
 BOOST_AUTO_TEST_CASE(test_some_attributes)
 {
@@ -105,7 +180,7 @@ BOOST_AUTO_TEST_CASE(test_some_attributes)
     BOOST_CHECK_EQUAL( data[1][1], "3" );
 }
 
-BOOST_AUTO_TEST_CASE(test_types)
+BOOST_AUTO_TEST_CASE(test_types_mvd2)
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/circuits/18.10.10_600cell/circuit.mvd2";
@@ -149,6 +224,36 @@ BOOST_AUTO_TEST_CASE(test_types)
     BOOST_CHECK_EQUAL( etypes[6], "bAD" );
     BOOST_CHECK_EQUAL( etypes[7], "cST" );
 }
+
+BOOST_AUTO_TEST_CASE(test_types_mvd3)
+{
+    boost::filesystem::path path( BBP_TESTDATA );
+    path /= "circuitBuilding_1000neurons/circuits/circuit_test.mvd3";
+
+    brion::Circuit circuit( path.string( ));
+    BOOST_CHECK_EQUAL( circuit.getNumNeurons(), 1000 );
+
+    const brion::Strings& mtypes = circuit.getTypes( brion::NEURONCLASS_MTYPE );
+    BOOST_CHECK_EQUAL( mtypes.size(), 9 );
+    BOOST_CHECK_EQUAL( mtypes[0], "L1_SLAC" );
+    BOOST_CHECK_EQUAL( mtypes[1], "L23_PC" );
+    BOOST_CHECK_EQUAL( mtypes[2], "L23_MC" );
+    BOOST_CHECK_EQUAL( mtypes[8], "L6_MC" );
+
+
+    const brion::Strings& fclasses =
+                          circuit.getTypes( brion::NEURONCLASS_FUNCTION_CLASS );
+    BOOST_CHECK_EQUAL( fclasses.size(), 2 );
+    BOOST_CHECK_EQUAL( fclasses[0], "INH" );
+    BOOST_CHECK_EQUAL( fclasses[1], "EXC" );
+
+    const brion::Strings& etypes =
+                                   circuit.getTypes( brion::NEURONCLASS_ETYPE );
+    BOOST_CHECK_EQUAL( etypes.size(), 2 );
+    BOOST_CHECK_EQUAL( etypes[0], "cACint" );
+    BOOST_CHECK_EQUAL( etypes[1], "cADpyr" );
+}
+
 
 BOOST_AUTO_TEST_CASE( brain_circuit_constructor )
 {

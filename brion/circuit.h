@@ -69,6 +69,15 @@ public:
     BRION_API NeuronMatrix get( const GIDSet& gids,
                                 const uint32_t attributes ) const;
 
+
+    /**
+     * @param gids set of neurons of interest; if empty, all neurons in the
+     *             circuit file are considered
+     *
+     * @return Vector of (X,Y,Z) positions of the given cells
+     */
+    BRION_API Vector3fs getPositions( const GIDSet& gids ) const;
+
     /** @return number of neurons stored in the circuit file. @version 1.0 */
     BRION_API size_t getNumNeurons() const;
 
@@ -83,7 +92,11 @@ public:
 
 private:
     class Impl;
+    class ImplMVD2;
+    class ImplMVD3;
     Impl* const _impl;
+
+    static Impl* instanciate(const std::string & file);
 };
 
 }

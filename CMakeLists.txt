@@ -22,6 +22,8 @@ set(BRION_MAINTAINER
 set(BRION_LICENSE LGPL)
 
 set(COMMON_PROJECT_DOMAIN ch.epfl.bluebrain)
+set(MVD_TOOL_DISABLE_INSTALL TRUE) # enable MVD-tool embedded usage
+
 include(Common)
 
 common_package(BBPTestData)

@@ -141,32 +141,7 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
 
 Vector3fs Circuit::getPositions( const GIDSet& gids ) const
 {
-    const brion::NeuronMatrix& data = _impl->getCircuit().get(
-        gids, brion::NEURON_POSITION_X | brion::NEURON_POSITION_Y |
-             brion::NEURON_POSITION_Z );
-
-    brion::GIDSet::const_iterator gid = gids.begin();
-    Vector3fs positions( gids.size( ));
-    #pragma omp parallel for
-    for( size_t i = 0; i < gids.size(); ++i )
-    {
-        try
-        {
-            positions[i] =
-                brion::Vector3f( boost::lexical_cast< float >( data[i][0] ),
-                                 boost::lexical_cast< float >( data[i][1] ),
-                                 boost::lexical_cast< float >( data[i][2] ));
-        }
-        catch( const boost::bad_lexical_cast& )
-        {
-            LBWARN << "Error parsing circuit position or orientation for gid "
-                   << *gid << ". Morphology not transformed." << std::endl;
-            positions[i] = Vector3f::ZERO;
-        }
-        #pragma omp critical (brain_circuit_getPositions)
-        ++gid;
-    }
-    return positions;
+    return _impl->getCircuit().getPositions(gids);
 }
 
 Matrix4fs Circuit::getTransforms( const GIDSet& gids ) const

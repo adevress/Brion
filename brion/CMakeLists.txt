@@ -4,6 +4,8 @@
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
 #
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../mvd-tool/include/ ${CMAKE_CURRENT_SOURCE_DIR}/../mvd-tool/deps/highfive/include )
+
 source_group(\\ FILES CMakeLists.txt)
 
 set(BRION_PUBLIC_HEADERS

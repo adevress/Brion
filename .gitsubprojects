@@ -2,3 +2,5 @@
 git_subproject(Servus https://github.com/HBPVIS/Servus.git 567f038)
 git_subproject(Lunchbox https://github.com/Eyescale/Lunchbox.git b41edcf)
 git_subproject(vmmlib https://github.com/Eyescale/vmmlib.git b41e1a5)
+git_subproject(mvd-tool ssh://bbpcode.epfl.ch/hpc/MVD-tool 517ca7f)
+
