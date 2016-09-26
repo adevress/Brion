@@ -26,7 +26,7 @@ include(Common)
 
 common_find_package(BBPTestData)
 common_find_package(Boost REQUIRED COMPONENTS
-  date_time filesystem program_options regex system unit_test_framework)
+  date_time python${USE_BOOST_PYTHON_VERSION} filesystem program_options regex system unit_test_framework)
 common_find_package(HDF5 SYSTEM REQUIRED COMPONENTS C CXX)
 common_find_package(Lunchbox REQUIRED)
 common_find_package(NumPy 1.7 REQUIRED)
