@@ -78,9 +78,7 @@ BOOST_PYTHON_MODULE(_brain)
 
     brain::neuron::export_module();
 
-#ifdef BRION_USE_BBPTESTDATA
     brain::export_test();
-#endif 
 
     brain::export_Circuit();
     brain::export_Spikes();
